@@ -83,7 +83,7 @@
         .idx-name { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .idx-val { font-size: 1rem; font-weight: 700; margin-top: 2px; }
 
-        /* --- 4. LEARNING HUB (TABBED STYLE) --- */
+        /* --- 4. LEARNING HUB (TABBED) --- */
         .basics-section { padding: 20px 30px; border-bottom: 1px solid var(--border); }
         .basics-header { font-size: 1.1rem; color: var(--accent); margin-bottom: 20px; font-weight: 600; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
         
@@ -113,13 +113,8 @@
         .term-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .t-title { font-weight: 700; color: var(--text-main); font-size: 1rem; }
         .t-rank { font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; color: var(--text-muted); }
-        
         .t-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
-        
-        .t-example { 
-            background: rgba(41, 98, 255, 0.1); padding: 8px 10px; border-radius: 4px; 
-            font-size: 0.8rem; color: var(--text-main); 
-        }
+        .t-example { background: rgba(41, 98, 255, 0.1); padding: 8px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--text-main); }
         .ex-label { font-weight: 700; color: var(--accent); font-size: 0.7rem; margin-right: 5px; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -142,33 +137,41 @@
         /* RIGHT PANEL */
         .main-panel { display: flex; flex-direction: column; gap: 20px; }
         .chart-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; justify-content: flex-end; }
+        
+        /* Redesigned Toolbar Elements */
         .btn-time {
             background: transparent; border: 1px solid var(--border); color: var(--text-muted);
-            padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: 0.2s;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: 0.2s;
         }
         .btn-time:hover, .btn-time.active { background: var(--bg-element); color: var(--accent); border-color: var(--accent); }
 
         .interval-select {
             background: var(--bg-element); color: var(--text-main); border: 1px solid var(--border);
-            padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; outline: none; cursor: pointer;
+            padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; outline: none; cursor: pointer;
         }
 
-        /* ANALYSIS BOX */
+        /* --- NEW: AI ANALYSIS BOX --- */
         .analysis-box {
-            background: var(--bg-element);
-            border-radius: 4px;
-            padding: 15px;
-            margin-top: 15px;
-            border-left: 4px solid var(--accent);
-            font-size: 0.9rem;
-            color: var(--text-main);
-            line-height: 1.6;
+            background: var(--bg-panel); border: 1px solid var(--border);
+            border-radius: 6px; overflow: hidden; margin-top: 15px;
         }
-        .analysis-box strong { color: #fff; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-right: 5px; }
-        .badge.bull { background: rgba(8, 153, 129, 0.2); color: var(--green); }
-        .badge.bear { background: rgba(242, 54, 69, 0.2); color: var(--red); }
-        .badge.neutral { background: rgba(132, 142, 156, 0.2); color: var(--text-muted); }
+        .analysis-header {
+            background: var(--bg-element); padding: 10px 15px; border-bottom: 1px solid var(--border);
+            font-weight: 700; font-size: 0.9rem; color: var(--accent); display: flex; align-items: center; gap: 8px;
+        }
+        .analysis-content {
+            padding: 15px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;
+        }
+        @media (max-width: 800px) { .analysis-content { grid-template-columns: 1fr; } }
+
+        .analysis-metric { margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+        .analysis-metric:last-child { border: none; }
+        .metric-val { color: var(--text-main); font-weight: 600; }
+        
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .badge.bull { background: rgba(8, 153, 129, 0.15); color: var(--green); border: 1px solid rgba(8, 153, 129, 0.3); }
+        .badge.bear { background: rgba(242, 54, 69, 0.15); color: var(--red); border: 1px solid rgba(242, 54, 69, 0.3); }
+        .badge.neutral { background: rgba(132, 142, 156, 0.15); color: var(--text-muted); border: 1px solid rgba(132, 142, 156, 0.3); }
 
         /* TABS */
         .tabs-container { margin-top: 20px; }
@@ -554,6 +557,8 @@
             <div class="data-row"><span class="lbl">ROE</span> <span class="val">${f.returnOnEquity?.fmt || '-'}</span></div>
             <div class="data-row"><span class="lbl">52W High</span> <span class="val text-green">${s.fiftyTwoWeekHigh?.fmt || '-'}</span></div>
             <div class="data-row"><span class="lbl">52W Low</span> <span class="val text-red">${s.fiftyTwoWeekLow?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Day High</span> <span class="val">${s.dayHigh?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Day Low</span> <span class="val">${s.dayLow?.fmt || '-'}</span></div>
         `;
         document.getElementById('keyStats').innerHTML = html;
     }
@@ -635,11 +640,11 @@
         if(candles.length < 2) return;
 
         const last = candles[candles.length - 1];
-        const prev = candles[candles.length - 2];
         const lastClose = last.y[3];
         const lastOpen = last.y[0];
         const lastHigh = last.y[1];
         const lastLow = last.y[2];
+        const prevClose = closes[closes.length - 2];
         
         const lastRSI = rsi[rsi.length - 1] || 50;
         const lastVol = volumes[volumes.length - 1] || 0;
@@ -650,51 +655,60 @@
 
         // 1. Trend Analysis
         let trend = (lastClose > lastOpen) ? 
-            `<span class="badge bull">BULLISH</span> Candle` : 
-            `<span class="badge bear">BEARISH</span> Candle`;
+            `<span class="badge bull">BULLISH</span>` : 
+            `<span class="badge bear">BEARISH</span>`;
         
-        let moveDesc = `The stock moved from <strong>${lastOpen.toFixed(2)}</strong> to <strong>${lastClose.toFixed(2)}</strong>.`;
+        let moveDesc = `Stock is trading at <strong>${lastClose.toFixed(2)}</strong>.`;
 
         // 2. Moving Average
         let maDesc = "";
         if (lastClose > lastEma13 && lastEma13 > lastEma49) {
-            maDesc = "Price is above both EMA 13 and EMA 49, indicating a <strong class='text-green'>Strong Uptrend</strong>.";
+            maDesc = "<span class='badge bull'>STRONG UPTREND</span> > EMA 13/49";
         } else if (lastClose < lastEma13 && lastClose < lastEma49) {
-            maDesc = "Price is below both EMAs, indicating a <strong class='text-red'>Downtrend</strong>.";
+            maDesc = "<span class='badge bear'>DOWNTREND</span> < EMA 13/49";
         } else {
-            maDesc = "Price is hovering between EMAs, indicating <strong class='text-muted'>Consolidation</strong>.";
+            maDesc = "<span class='badge neutral'>CONSOLIDATION</span>";
         }
 
         // 3. RSI
-        let rsiDesc = `RSI is at <strong>${lastRSI.toFixed(1)}</strong>.`;
-        if (lastRSI > 70) rsiDesc += " <span class='badge bear'>OVERBOUGHT</span> Caution advised.";
-        else if (lastRSI < 30) rsiDesc += " <span class='badge bull'>OVERSOLD</span> Potential bounce.";
-        else rsiDesc += " <span class='badge neutral'>NEUTRAL</span> zone.";
+        let rsiDesc = `RSI: <strong>${lastRSI.toFixed(1)}</strong>`;
+        if (lastRSI > 70) rsiDesc += " <span class='badge bear'>OVERBOUGHT</span>";
+        else if (lastRSI < 30) rsiDesc += " <span class='badge bull'>OVERSOLD</span>";
+        else rsiDesc += " <span class='badge neutral'>NEUTRAL</span>";
 
-        // 4. Volume & Bulk Deal
-        let volDesc = `Volume: <strong>${(lastVol/1000).toFixed(1)}K</strong> (Avg: ${(avgVol/1000).toFixed(1)}K).`;
-        let bulkDeal = "";
-        if (lastVol > avgVol * 2.5) {
-            volDesc += " <strong class='text-green'>High Volume Spike!</strong>";
-            bulkDeal = "<br>⚠️ <strong>Institutional Activity:</strong> Unusual volume detected. Possible Bulk/Block deal or major news reaction.";
-        } else {
-            volDesc += " Volume is normal.";
-        }
+        // 4. Volume
+        let volDesc = `Vol: <strong>${(lastVol/1000).toFixed(1)}K</strong>`;
+        if (lastVol > avgVol * 2) volDesc += " <span class='badge bull'>HIGH VOL</span>";
 
-        // 5. Pattern
-        let pattern = "";
-        const bodySize = Math.abs(lastClose - lastOpen);
-        const wickSize = (lastHigh - lastLow) - bodySize;
-        if (bodySize < wickSize * 0.1) pattern = "Pattern: <strong>Doji</strong> (Indecision detected).";
-        else if (lastClose > lastOpen && (lastClose - lastLow) > bodySize * 2 && (lastHigh - lastClose) < bodySize * 0.2) pattern = "Pattern: <strong>Hammer</strong> (Potential Reversal).";
-
-        // HTML Output
+        // NEW: OHLC GRID
         const html = `
-            ${trend} ${moveDesc}<br><br>
-            <strong>Moving Averages:</strong> ${maDesc}<br>
-            <strong>Momentum:</strong> ${rsiDesc}<br>
-            <strong>Volume:</strong> ${volDesc} ${bulkDeal}<br>
-            ${pattern ? `<br>${pattern}` : ''}
+            <div class="analysis-header"><i class="fas fa-robot"></i> AI TRADE ANALYSIS</div>
+            <div class="analysis-content">
+                <div class="flex flex-col gap-10">
+                    <div class="analysis-metric">
+                        <span>Trend</span> 
+                        <div>${trend}</div>
+                    </div>
+                    <div class="analysis-metric">
+                        <span>Signal</span>
+                        <div>${maDesc}</div>
+                    </div>
+                    <div class="analysis-metric">
+                        <span>Momentum</span>
+                        <div>${rsiDesc}</div>
+                    </div>
+                    <div class="analysis-metric">
+                        <span>Volume</span>
+                        <div>${volDesc}</div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-10" style="border-left:1px solid #2a2e39; padding-left:20px;">
+                    <div class="analysis-metric"><span>OPEN</span> <span class="metric-val">${lastOpen.toFixed(2)}</span></div>
+                    <div class="analysis-metric"><span>HIGH</span> <span class="metric-val text-green">${lastHigh.toFixed(2)}</span></div>
+                    <div class="analysis-metric"><span>LOW</span> <span class="metric-val text-red">${lastLow.toFixed(2)}</span></div>
+                    <div class="analysis-metric"><span>PREV CLOSE</span> <span class="metric-val">${prevClose.toFixed(2)}</span></div>
+                </div>
+            </div>
         `;
 
         const card = document.getElementById('analysisCard');
