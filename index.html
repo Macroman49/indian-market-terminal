@@ -83,44 +83,46 @@
         .idx-name { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .idx-val { font-size: 1rem; font-weight: 700; margin-top: 2px; }
 
-        /* --- 4. LEARNING HUB (ACCORDION STYLE) --- */
+        /* --- 4. LEARNING HUB (TABBED STYLE) --- */
         .basics-section { padding: 20px 30px; border-bottom: 1px solid var(--border); }
         .basics-header { font-size: 1.1rem; color: var(--accent); margin-bottom: 20px; font-weight: 600; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
         
-        .accordion { display: flex; flex-direction: column; gap: 8px; }
-        .accordion-item { 
-            background: var(--bg-panel); border: 1px solid var(--border); 
-            border-radius: 4px; overflow: hidden; transition: border-color 0.2s;
+        .basics-tabs-container {
+            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
         }
-        .accordion-item:hover { border-color: var(--accent); }
-        
-        .accordion-header {
-            padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-element); transition: background 0.2s;
+        .basics-tabs-header {
+            display: flex; border-bottom: 1px solid var(--border); background: var(--bg-element);
         }
-        .accordion-header:hover { background: #363c4e; }
-        
-        .term-title { font-weight: 600; color: var(--text-main); font-size: 0.95rem; }
-        .term-rank { font-size: 0.75rem; color: var(--text-muted); margin-right: 10px; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
-        .accordion-icon { color: var(--text-muted); transition: transform 0.3s; font-size: 0.8rem; }
-        
-        .accordion-item.active .accordion-icon { transform: rotate(180deg); color: var(--accent); }
-        
-        .accordion-content {
-            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s;
-            background: var(--bg-panel); color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;
+        .basics-tab-btn {
+            padding: 12px 20px; background: transparent; border: none;
+            color: var(--text-muted); font-weight: 600; cursor: pointer;
+            border-bottom: 2px solid transparent; font-size: 0.9rem; transition: all 0.2s;
         }
+        .basics-tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+        .basics-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--bg-panel); }
         
-        .accordion-item.active .accordion-content { 
-            max-height: 500px; padding: 20px; border-top: 1px solid var(--border); 
-        }
+        .basics-tab-content { display: none; padding: 20px; animation: fadeIn 0.3s; }
+        .basics-tab-content.active { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         
-        .example-box { 
-            margin-top: 12px; padding: 12px; background: rgba(41, 98, 255, 0.08); 
-            border-left: 3px solid var(--accent); border-radius: 4px; 
-            color: var(--text-main); font-size: 0.85rem; 
+        .term-box {
+            background: var(--bg-body); border: 1px solid var(--border); border-radius: 4px; padding: 15px;
+            border-left: 3px solid var(--accent); transition: transform 0.2s;
         }
-        .example-label { font-weight: 700; color: var(--accent); margin-right: 5px; font-size: 0.75rem; text-transform: uppercase; }
+        .term-box:hover { transform: translateY(-2px); border-color: var(--accent); }
+        
+        .term-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .t-title { font-weight: 700; color: var(--text-main); font-size: 1rem; }
+        .t-rank { font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; color: var(--text-muted); }
+        
+        .t-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+        
+        .t-example { 
+            background: rgba(41, 98, 255, 0.1); padding: 8px 10px; border-radius: 4px; 
+            font-size: 0.8rem; color: var(--text-main); 
+        }
+        .ex-label { font-weight: 700; color: var(--accent); font-size: 0.7rem; margin-right: 5px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* --- 5. DASHBOARD GRID --- */
         .dashboard { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px 30px; margin: 0 auto; display: none; }
@@ -194,186 +196,109 @@
         <div style="color:#777; font-size:0.9rem;">Loading Market Indices...</div>
     </div>
 
-    <!-- 4. LEARNING HUB (EXPANDABLE) -->
+    <!-- 4. LEARNING HUB (TABBED) -->
     <div class="basics-section">
         <div class="basics-header"><i class="fas fa-graduation-cap"></i> Market Terminology</div>
         
-        <div class="accordion">
-            <!-- 1. Share/Stock -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#1</span> Share / Stock</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
+        <div class="basics-tabs-container">
+            <!-- Tabs Header -->
+            <div class="basics-tabs-header">
+                <button class="basics-tab-btn active" onclick="switchBasicsTab('basics-general')">General</button>
+                <button class="basics-tab-btn" onclick="switchBasicsTab('basics-trading')">Trading</button>
+                <button class="basics-tab-btn" onclick="switchBasicsTab('basics-ratios')">Key Ratios</button>
+            </div>
+
+            <!-- Tab 1: General -->
+            <div id="basics-general" class="basics-tab-content active">
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Share / Stock</span><span class="t-rank">#1</span></div>
+                    <div class="t-desc">A unit of ownership in a company. Buying a share makes you a partial owner.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Buying 1 share of Reliance for ₹2,500.</div>
                 </div>
-                <div class="accordion-content">
-                    A Share represents a unit of ownership in a company. When you buy a share, you become a partial owner of that company. "Stock" generally refers to the ownership certificate of any company.
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> If you buy 1 share of Reliance Industries for ₹2,500, you own a tiny fraction of Reliance. If the company value goes up, your share price goes up.
-                    </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Sensex & Nifty</span><span class="t-rank">#2</span></div>
+                    <div class="t-desc">Benchmark indices representing the market health (Top 30 BSE & Top 50 NSE companies).</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Nifty up 1% means top 50 companies did well.</div>
+                </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Bull vs Bear</span><span class="t-rank">#3</span></div>
+                    <div class="t-desc">Bull: Market rising, optimism high. Bear: Market falling (>20%), pessimism high.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> "Bull run" means sustained price increase.</div>
+                </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">IPO</span><span class="t-rank">#4</span></div>
+                    <div class="t-desc">Initial Public Offering. First time a private company sells shares to the public.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Zomato listing on the exchange in 2021.</div>
+                </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Dividend</span><span class="t-rank">#5</span></div>
+                    <div class="t-desc">A share of profits paid to shareholders directly into their bank accounts.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> ITC pays ₹5/share dividend annually.</div>
+                </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Portfolio</span><span class="t-rank">#6</span></div>
+                    <div class="t-desc">A collection of financial investments like stocks, bonds, and mutual funds.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Holding 50% IT stocks and 50% Bank stocks.</div>
                 </div>
             </div>
 
-            <!-- 2. Sensex & Nifty -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#2</span> Sensex & Nifty</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
+            <!-- Tab 2: Trading -->
+            <div id="basics-trading" class="basics-tab-content">
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Demat Account</span><span class="t-rank">#1</span></div>
+                    <div class="t-desc">An account to hold shares in electronic format, mandatory for trading in India.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Like a bank account for your shares.</div>
                 </div>
-                <div class="accordion-content">
-                    These are benchmark indices that represent the health of the Indian Stock Market.<br>
-                    <strong>Sensex:</strong> Tracks the top 30 companies on the BSE (Bombay Stock Exchange).<br>
-                    <strong>Nifty 50:</strong> Tracks the top 50 companies on the NSE (National Stock Exchange).
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> If Nifty goes up by 1%, it generally means the top 50 major Indian companies performed well that day.
-                    </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Intraday</span><span class="t-rank">#2</span></div>
+                    <div class="t-desc">Buying and selling shares on the same day. No delivery to Demat account.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Buy Tata Motors at 10 AM, sell at 3 PM.</div>
                 </div>
-            </div>
-
-            <!-- 3. Bull & Bear Market -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#3</span> Bull vs Bear Market</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Delivery</span><span class="t-rank">#3</span></div>
+                    <div class="t-desc">Buying shares and holding them for more than one day. Stored in Demat.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Buy today, sell next week or next year.</div>
                 </div>
-                <div class="accordion-content">
-                    Market sentiments describing the trend of stock prices.<br>
-                    <strong>Bull Market:</strong> Prices are rising, and investor confidence is high.<br>
-                    <strong>Bear Market:</strong> Prices are falling (usually >20%), and sentiment is pessimistic.
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> "The market is bullish" means everyone expects stocks to go up. "The market is bearish" means people are selling in fear.
-                    </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Stop Loss</span><span class="t-rank">#4</span></div>
+                    <div class="t-desc">An automatic order to sell a stock if it falls to a certain price to limit loss.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Buy at 100, Stop Loss at 95 to limit loss to ₹5.</div>
+                </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Volatility</span><span class="t-rank">#5</span></div>
+                    <div class="t-desc">Measure of how wildly a stock price swings. High volatility = High Risk/Reward.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Crypto is highly volatile; FD is zero volatility.</div>
                 </div>
             </div>
 
-            <!-- 4. Dividend -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#4</span> Dividend</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
+            <!-- Tab 3: Ratios -->
+            <div id="basics-ratios" class="basics-tab-content">
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Market Cap</span><span class="t-rank">#1</span></div>
+                    <div class="t-desc">Total value of a company. (Share Price x Total Shares). Indicates size.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Reliance is Large Cap; New firms are Small Cap.</div>
                 </div>
-                <div class="accordion-content">
-                    A portion of the company's profit distributed to its shareholders. Not all companies pay dividends; some reinvest profits back into growth.
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> ITC declares a dividend of ₹5 per share. If you hold 100 shares, you receive ₹500 directly in your bank account.
-                    </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">P/E Ratio</span><span class="t-rank">#2</span></div>
+                    <div class="t-desc">Price-to-Earnings. How much you pay for ₹1 of profit. High P/E = Expensive/Growth.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> P/E 20 means paying ₹20 for ₹1 profit.</div>
                 </div>
-            </div>
-
-            <!-- 5. IPO -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#5</span> IPO (Initial Public Offering)</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">EPS</span><span class="t-rank">#3</span></div>
+                    <div class="t-desc">Earnings Per Share. Net Profit divided by total shares. Higher is better.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Profit 100Cr, 10Cr shares -> EPS = ₹10.</div>
                 </div>
-                <div class="accordion-content">
-                    The process by which a private company offers shares to the public for the first time to raise capital. This is when a company lists on the stock exchange.
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> When Zomato listed on the stock market in 2021, it launched an IPO where public investors could buy shares before they started trading.
-                    </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">ROE</span><span class="t-rank">#4</span></div>
+                    <div class="t-desc">Return on Equity. Measures profitability relative to shareholder money.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> ROE 15% means ₹15 profit on every ₹100 invested.</div>
                 </div>
-            </div>
-
-            <!-- 6. Demat Account -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#6</span> Demat Account</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
-                </div>
-                <div class="accordion-content">
-                    Short for "Dematerialized Account". It is like a bank account but for shares. It holds your shares in electronic format. You need one to trade in India.
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> When you buy shares via Zerodha or Upstox, the shares are digitally stored in your CDSL/NSDL Demat account.
-                    </div>
+                <div class="term-box">
+                    <div class="term-head"><span class="t-title">Book Value</span><span class="t-rank">#5</span></div>
+                    <div class="t-desc">The value of the company's assets if it liquidated today (per share).</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Buying below Book Value is often considered a value deal.</div>
                 </div>
             </div>
-
-            <!-- 7. Intraday vs Delivery -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#7</span> Intraday vs Delivery</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
-                </div>
-                <div class="accordion-content">
-                    <strong>Intraday:</strong> Buying and selling a stock on the same day. No shares enter your Demat account.<br>
-                    <strong>Delivery:</strong> Buying a stock and holding it for more than one day. Shares are delivered to your Demat account (T+1 day).
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> Buying Tata Motors at 10 AM and selling at 3 PM is Intraday. Buying it and selling it next week is Delivery.
-                    </div>
-                </div>
-            </div>
-
-            <!-- 8. Market Capitalization -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#8</span> Market Capitalization (Market Cap)</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
-                </div>
-                <div class="accordion-content">
-                    The total market value of a company's outstanding shares. It determines the size of the company.<br>
-                    <em>Formula: Current Share Price × Total Number of Shares.</em>
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> Reliance is a "Large Cap" company (High value). A new small company might be "Small Cap" (Higher risk, higher growth potential).
-                    </div>
-                </div>
-            </div>
-
-            <!-- 9. PE Ratio -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#9</span> P/E Ratio</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
-                </div>
-                <div class="accordion-content">
-                    Price-to-Earnings Ratio. It measures how expensive a stock is relative to its earnings.<br>
-                    <em>Formula: Share Price / Earnings Per Share (EPS).</em>
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> A P/E of 20 means investors are willing to pay ₹20 for every ₹1 of profit the company makes. High P/E usually means high growth expectations.
-                    </div>
-                </div>
-            </div>
-
-            <!-- 10. Portfolio -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#10</span> Portfolio</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
-                </div>
-                <div class="accordion-content">
-                    A collection of financial investments like stocks, bonds, mutual funds, and cash held by an individual or institution.
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> Your portfolio might consist of 50% IT stocks (TCS, Infy), 30% Bank stocks (HDFC, SBI), and 20% Gold.
-                    </div>
-                </div>
-            </div>
-
-            <!-- 11. Volatility -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#11</span> Volatility</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
-                </div>
-                <div class="accordion-content">
-                    A measure of how much a stock's price swings up and down. High volatility means high risk but potential for high quick returns.
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> Blue-chip stocks like HUL have low volatility (stable). Crypto or Small-cap stocks often have high volatility (wild price swings).
-                    </div>
-                </div>
-            </div>
-
-            <!-- 12. Stop Loss -->
-            <div class="accordion-item" onclick="toggleAccordion(this)">
-                <div class="accordion-header">
-                    <span class="term-title"><span class="term-rank">#12</span> Stop Loss</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
-                </div>
-                <div class="accordion-content">
-                    An order placed to sell a security when it reaches a certain price. It is used to limit an investor's loss on a position.
-                    <div class="example-box">
-                        <span class="example-label">EXAMPLE</span> You buy a stock at ₹100. You set a Stop Loss at ₹95. If the price falls to ₹95, it automatically sells to prevent you from losing more if it crashes to ₹80.
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
@@ -458,18 +383,13 @@
         }, 1000);
     }
 
-    // --- ACCORDION LOGIC ---
-    window.toggleAccordion = function(element) {
-        const isActive = element.classList.contains('active');
+    // --- NEW: BASICS TABS LOGIC ---
+    window.switchBasicsTab = function(tabId) {
+        document.querySelectorAll('.basics-tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.basics-tab-btn').forEach(el => el.classList.remove('active'));
         
-        // Optional: Close all others
-        document.querySelectorAll('.accordion-item').forEach(item => {
-            item.classList.remove('active');
-        });
-
-        if (!isActive) {
-            element.classList.add('active');
-        }
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
     }
 
     // --- SAFE FETCH WRAPPER ---
@@ -780,4 +700,3 @@
 </script>
 </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
