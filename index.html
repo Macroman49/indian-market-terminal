@@ -141,12 +141,17 @@
 
         /* RIGHT PANEL */
         .main-panel { display: flex; flex-direction: column; gap: 20px; }
-        .chart-toolbar { display: flex; gap: 10px; margin-bottom: 10px; justify-content: flex-end; }
+        .chart-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; justify-content: flex-end; }
         .btn-time {
             background: transparent; border: 1px solid var(--border); color: var(--text-muted);
             padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: 0.2s;
         }
         .btn-time:hover, .btn-time.active { background: var(--bg-element); color: var(--accent); border-color: var(--accent); }
+
+        .interval-select {
+            background: var(--bg-element); color: var(--text-main); border: 1px solid var(--border);
+            padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; outline: none; cursor: pointer;
+        }
 
         /* TABS */
         .tabs-container { margin-top: 20px; }
@@ -304,6 +309,17 @@
             <!-- CHART -->
             <div class="card" style="padding: 10px;">
                 <div class="chart-toolbar">
+                    <select id="chartInterval" class="interval-select" onchange="updateChartInterval(this.value)">
+                        <option value="1m">1 Min</option>
+                        <option value="5m" selected>5 Min</option>
+                        <option value="15m">15 Min</option>
+                        <option value="30m">30 Min</option>
+                        <option value="60m">1 Hour</option>
+                        <option value="1d">1 Day</option>
+                        <option value="1wk">1 Week</option>
+                        <option value="1mo">1 Month</option>
+                    </select>
+                    <div style="border-right: 1px solid var(--border); height: 20px; margin: 0 5px;"></div>
                     <button class="btn-time active" onclick="updateChartRange('1d')">1D</button>
                     <button class="btn-time" onclick="updateChartRange('5d')">5D</button>
                     <button class="btn-time" onclick="updateChartRange('1mo')">1M</button>
@@ -332,7 +348,7 @@
                 </div>
 
                 <div id="news" class="tab-content">
-                    <div id="newsList">Loading news...</div>
+                    <div id="newsList" style="padding:10px;">No recent news found via free API.</div>
                 </div>
             </div>
 
@@ -344,6 +360,8 @@
     const API_HOST = 'apidojo-yahoo-finance-v1.p.rapidapi.com'; 
 
     let currentSymbol = '';
+    let currentRange = '1d';
+    let currentInterval = '5m';
     let chartMain, chartRSI, chartFin;
 
     window.onload = function() {
@@ -449,8 +467,7 @@
         renderStatsFromQuote(stock); // Initial stats from Quote
 
         // 2. CHART DATA
-        const chartData = await safeFetch(`https://${API_HOST}/stock/v3/get-chart?interval=1d&range=1y&symbol=${symbol}&region=IN`);
-        if(chartData) renderCharts(chartData.chart?.result?.[0]);
+        updateChartData();
 
         // 3. DETAILED DATA (Financials/News) - Might fail on free tier, so we handle it softly
         const summaryData = await safeFetch(`https://${API_HOST}/stock/v2/get-summary?symbol=${symbol}&region=IN`);
@@ -641,9 +658,19 @@
     window.updateChartRange = function(range) {
         document.querySelectorAll('.btn-time').forEach(b => b.classList.remove('active'));
         event.target.classList.add('active');
-        const interval = range === '1d' ? '5m' : '1d';
-        safeFetch(`https://${API_HOST}/stock/v3/get-chart?interval=${interval}&range=${range}&symbol=${currentSymbol}&region=IN`)
-            .then(d => renderCharts(d?.chart?.result?.[0]));
+        currentRange = range; // Update range state
+        updateChartData(); // Call updated function
+    }
+
+    window.updateChartInterval = function(interval) {
+        currentInterval = interval;
+        updateChartData(); // Call updated function
+    }
+
+    async function updateChartData() {
+        if (!currentSymbol) return;
+        const chartData = await safeFetch(`https://${API_HOST}/stock/v3/get-chart?interval=${currentInterval}&range=${currentRange}&symbol=${currentSymbol}&region=IN`);
+        if(chartData) renderCharts(chartData.chart?.result?.[0]);
     }
 
     function calculateRSI(prices, period = 14) {
