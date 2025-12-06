@@ -166,6 +166,13 @@
         .metric-box h4 { margin: 0 0 5px 0; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
         .metric-box p { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
 
+        /* NEWS LIST */
+        .news-item { padding: 15px; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+        .news-item:hover { background: var(--bg-element); }
+        .news-link { text-decoration: none; color: var(--text-main); display: block; }
+        .news-title { font-weight: 600; margin-bottom: 5px; font-size: 1rem; }
+        .news-meta { font-size: 0.8rem; color: var(--text-muted); }
+
         .loader { text-align: center; padding: 50px; color: var(--accent); font-size: 1.2rem; display: none; }
     </style>
 </head>
@@ -201,14 +208,13 @@
         <div class="basics-header"><i class="fas fa-graduation-cap"></i> Market Terminology</div>
         
         <div class="basics-tabs-container">
-            <!-- Tabs Header -->
             <div class="basics-tabs-header">
                 <button class="basics-tab-btn active" onclick="switchBasicsTab('basics-general')">General</button>
                 <button class="basics-tab-btn" onclick="switchBasicsTab('basics-trading')">Trading</button>
                 <button class="basics-tab-btn" onclick="switchBasicsTab('basics-ratios')">Key Ratios</button>
             </div>
 
-            <!-- Tab 1: General -->
+            <!-- TAB 1: GENERAL -->
             <div id="basics-general" class="basics-tab-content active">
                 <div class="term-box">
                     <div class="term-head"><span class="t-title">Share / Stock</span><span class="t-rank">#1</span></div>
@@ -230,19 +236,9 @@
                     <div class="t-desc">Initial Public Offering. First time a private company sells shares to the public.</div>
                     <div class="t-example"><span class="ex-label">EX</span> Zomato listing on the exchange in 2021.</div>
                 </div>
-                <div class="term-box">
-                    <div class="term-head"><span class="t-title">Dividend</span><span class="t-rank">#5</span></div>
-                    <div class="t-desc">A share of profits paid to shareholders directly into their bank accounts.</div>
-                    <div class="t-example"><span class="ex-label">EX</span> ITC pays ₹5/share dividend annually.</div>
-                </div>
-                <div class="term-box">
-                    <div class="term-head"><span class="t-title">Portfolio</span><span class="t-rank">#6</span></div>
-                    <div class="t-desc">A collection of financial investments like stocks, bonds, and mutual funds.</div>
-                    <div class="t-example"><span class="ex-label">EX</span> Holding 50% IT stocks and 50% Bank stocks.</div>
-                </div>
             </div>
 
-            <!-- Tab 2: Trading -->
+            <!-- TAB 2: TRADING -->
             <div id="basics-trading" class="basics-tab-content">
                 <div class="term-box">
                     <div class="term-head"><span class="t-title">Demat Account</span><span class="t-rank">#1</span></div>
@@ -255,48 +251,28 @@
                     <div class="t-example"><span class="ex-label">EX</span> Buy Tata Motors at 10 AM, sell at 3 PM.</div>
                 </div>
                 <div class="term-box">
-                    <div class="term-head"><span class="t-title">Delivery</span><span class="t-rank">#3</span></div>
-                    <div class="t-desc">Buying shares and holding them for more than one day. Stored in Demat.</div>
-                    <div class="t-example"><span class="ex-label">EX</span> Buy today, sell next week or next year.</div>
-                </div>
-                <div class="term-box">
-                    <div class="term-head"><span class="t-title">Stop Loss</span><span class="t-rank">#4</span></div>
+                    <div class="term-head"><span class="t-title">Stop Loss</span><span class="t-rank">#3</span></div>
                     <div class="t-desc">An automatic order to sell a stock if it falls to a certain price to limit loss.</div>
-                    <div class="t-example"><span class="ex-label">EX</span> Buy at 100, Stop Loss at 95 to limit loss to ₹5.</div>
-                </div>
-                <div class="term-box">
-                    <div class="term-head"><span class="t-title">Volatility</span><span class="t-rank">#5</span></div>
-                    <div class="t-desc">Measure of how wildly a stock price swings. High volatility = High Risk/Reward.</div>
-                    <div class="t-example"><span class="ex-label">EX</span> Crypto is highly volatile; FD is zero volatility.</div>
+                    <div class="t-example"><span class="ex-label">EX</span> Buy at 100, Stop Loss at 95.</div>
                 </div>
             </div>
 
-            <!-- Tab 3: Ratios -->
+            <!-- TAB 3: RATIOS -->
             <div id="basics-ratios" class="basics-tab-content">
                 <div class="term-box">
-                    <div class="term-head"><span class="t-title">Market Cap</span><span class="t-rank">#1</span></div>
-                    <div class="t-desc">Total value of a company. (Share Price x Total Shares). Indicates size.</div>
-                    <div class="t-example"><span class="ex-label">EX</span> Reliance is Large Cap; New firms are Small Cap.</div>
-                </div>
-                <div class="term-box">
-                    <div class="term-head"><span class="t-title">P/E Ratio</span><span class="t-rank">#2</span></div>
+                    <div class="term-head"><span class="t-title">P/E Ratio</span><span class="t-rank">#1</span></div>
                     <div class="t-desc">Price-to-Earnings. How much you pay for ₹1 of profit. High P/E = Expensive/Growth.</div>
                     <div class="t-example"><span class="ex-label">EX</span> P/E 20 means paying ₹20 for ₹1 profit.</div>
                 </div>
                 <div class="term-box">
-                    <div class="term-head"><span class="t-title">EPS</span><span class="t-rank">#3</span></div>
+                    <div class="term-head"><span class="t-title">EPS</span><span class="t-rank">#2</span></div>
                     <div class="t-desc">Earnings Per Share. Net Profit divided by total shares. Higher is better.</div>
                     <div class="t-example"><span class="ex-label">EX</span> Profit 100Cr, 10Cr shares -> EPS = ₹10.</div>
                 </div>
                 <div class="term-box">
-                    <div class="term-head"><span class="t-title">ROE</span><span class="t-rank">#4</span></div>
+                    <div class="term-head"><span class="t-title">ROE</span><span class="t-rank">#3</span></div>
                     <div class="t-desc">Return on Equity. Measures profitability relative to shareholder money.</div>
                     <div class="t-example"><span class="ex-label">EX</span> ROE 15% means ₹15 profit on every ₹100 invested.</div>
-                </div>
-                <div class="term-box">
-                    <div class="term-head"><span class="t-title">Book Value</span><span class="t-rank">#5</span></div>
-                    <div class="t-desc">The value of the company's assets if it liquidated today (per share).</div>
-                    <div class="t-example"><span class="ex-label">EX</span> Buying below Book Value is often considered a value deal.</div>
                 </div>
             </div>
         </div>
@@ -356,7 +332,7 @@
                 </div>
 
                 <div id="news" class="tab-content">
-                    <div id="newsList" style="padding:10px;">No recent news found via free API.</div>
+                    <div id="newsList">Loading news...</div>
                 </div>
             </div>
 
@@ -383,51 +359,34 @@
         }, 1000);
     }
 
-    // --- NEW: BASICS TABS LOGIC ---
+    // --- BASICS TABS ---
     window.switchBasicsTab = function(tabId) {
         document.querySelectorAll('.basics-tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.basics-tab-btn').forEach(el => el.classList.remove('active'));
-        
         document.getElementById(tabId).classList.add('active');
         event.target.classList.add('active');
     }
 
-    // --- SAFE FETCH WRAPPER ---
+    // --- SAFE FETCH ---
     async function safeFetch(url) {
         try {
             const res = await fetch(url, { headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': API_HOST } });
-            if (!res.ok) {
-                console.warn(`API Error ${res.status}: ${res.statusText}`);
-                return null;
-            }
+            if (!res.ok) { console.warn(`Error ${res.status}`); return null; }
             return await res.json();
-        } catch (e) {
-            console.warn("Fetch failed:", e);
-            return null;
-        }
+        } catch (e) { return null; }
     }
 
     // --- LOAD INDICES ---
     async function loadIndices() {
-        // Fetch fewer indices to avoid rate limit issues
         const symbols = '^NSEI,^BSESN,^NSEBANK';
         const data = await safeFetch(`https://${API_HOST}/market/v2/get-quotes?region=IN&symbols=${symbols}`);
-        
         if(data && data.quoteResponse) {
             const container = document.getElementById('indicesBar');
             container.innerHTML = '';
-            
             data.quoteResponse.result.forEach(idx => {
                 const change = idx.regularMarketChangePercent?.toFixed(2) || 0;
                 const color = change >= 0 ? '#089981' : '#f23645';
-                
-                container.innerHTML += `
-                    <div class="mini-index">
-                        <div class="idx-name">${idx.shortName || idx.symbol}</div>
-                        <div class="idx-val" style="color:${color}">
-                            ${idx.regularMarketPrice?.toFixed(2)} (${change}%)
-                        </div>
-                    </div>`;
+                container.innerHTML += `<div class="mini-index"><div class="idx-name">${idx.shortName || idx.symbol}</div><div class="idx-val" style="color:${color}">${idx.regularMarketPrice?.toFixed(2)} (${change}%)</div></div>`;
             });
         }
     }
@@ -436,7 +395,6 @@
     async function loadMarquee() {
         const topStocks = 'RELIANCE.NS,TCS.NS,HDFCBANK.NS,INFY.NS';
         const data = await safeFetch(`https://${API_HOST}/market/v2/get-quotes?region=IN&symbols=${topStocks}`);
-        
         if(data && data.quoteResponse) {
             const marquee = document.getElementById('marquee');
             marquee.innerHTML = '';
@@ -461,11 +419,9 @@
         resultsBox.innerHTML = '<div style="padding:10px; color:#777;">Searching...</div>';
         
         const data = await safeFetch(`https://${API_HOST}/auto-complete?q=${query}&region=IN`);
-        
         resultsBox.innerHTML = '';
         if(data && data.quotes) {
             data.quotes.forEach(q => {
-                // Expanded filter to catch NSE/BSE/NSI
                 if(q.exchange === 'NSI' || q.exchange === 'NSE' || q.exchange === 'BSE' || q.symbol.includes('.NS') || q.symbol.includes('.BO')) {
                     resultsBox.innerHTML += `<div class="result-item" onclick="loadStockData('${q.symbol}')"><b>${q.symbol}</b> <span class="text-muted">${q.shortname || ''}</span></div>`;
                 }
@@ -483,55 +439,50 @@
         document.getElementById('loader').style.display = 'block';
         document.getElementById('dashboard').style.display = 'none';
 
-        // 1. PRIMARY FETCH: Basic Quote (Reliable)
+        // 1. BASIC DATA (Fast & Reliable)
         const quoteData = await safeFetch(`https://${API_HOST}/market/v2/get-quotes?region=IN&symbols=${symbol}`);
-        
-        if(!quoteData || !quoteData.quoteResponse || !quoteData.quoteResponse.result || quoteData.quoteResponse.result.length === 0) {
-            alert("Unable to fetch stock data. API limit may be reached.");
-            document.getElementById('loader').style.display = 'none';
-            return;
+        if(!quoteData || !quoteData.quoteResponse || !quoteData.quoteResponse.result.length) {
+            alert("Stock data unavailable."); document.getElementById('loader').style.display = 'none'; return;
         }
-
         const stock = quoteData.quoteResponse.result[0];
         renderHeaderFromQuote(stock);
-        renderStatsFromQuote(stock);
+        renderStatsFromQuote(stock); // Initial stats from Quote
 
-        // 2. CHART FETCH
+        // 2. CHART DATA
         const chartData = await safeFetch(`https://${API_HOST}/stock/v3/get-chart?interval=1d&range=1y&symbol=${symbol}&region=IN`);
         if(chartData) renderCharts(chartData.chart?.result?.[0]);
 
-        // 3. OPTIONAL FETCH: Summary (Might fail on free tier, but we don't break the app)
+        // 3. DETAILED DATA (Financials/News) - Might fail on free tier, so we handle it softly
         const summaryData = await safeFetch(`https://${API_HOST}/stock/v2/get-summary?symbol=${symbol}&region=IN`);
         if(summaryData) {
             renderFinancials(summaryData);
             renderRatios(summaryData);
-            // Explicitly update stats with correct Summary Data
-            renderStats(summaryData);
+            // Overwrite basic stats with detailed stats if available
+            renderStats(summaryData); 
         } else {
-            document.getElementById('financialsChart').innerHTML = '<div style="padding:20px; color:#777; text-align:center;">Detailed financials not available</div>';
+            document.getElementById('financialsChart').innerHTML = '<div style="padding:20px; color:#777; text-align:center;">Detailed financials locked (Free Tier Limit).</div>';
         }
+
+        // 4. NEWS (Separate Call for Robustness)
+        fetchNews(symbol);
 
         document.getElementById('loader').style.display = 'none';
         document.getElementById('dashboard').style.display = 'grid';
     }
 
     // --- RENDERERS ---
-    
     function renderHeaderFromQuote(stock) {
-        document.getElementById('stockName').innerText = stock.shortName || stock.longName || stock.symbol;
+        document.getElementById('stockName').innerText = stock.shortName || stock.longName;
         document.getElementById('stockSymbol').innerText = stock.symbol;
         document.getElementById('stockPrice').innerText = `₹${stock.regularMarketPrice.toFixed(2)}`;
-        
         const change = stock.regularMarketChange;
-        const colorClass = change >= 0 ? 'text-green' : 'text-red';
-        document.getElementById('stockChange').className = colorClass;
+        document.getElementById('stockChange').className = change >= 0 ? 'text-green' : 'text-red';
         document.getElementById('stockChange').innerText = `${stock.regularMarketChange.toFixed(2)} (${stock.regularMarketChangePercent.toFixed(2)}%)`;
     }
 
-    // INITIAL RENDER: Uses basic quote data (fast but maybe less accurate)
+    // Basic Stats from Quote
     function renderStatsFromQuote(stock) {
         const marketCap = stock.marketCap ? (stock.marketCap / 10000000).toFixed(2) + ' Cr' : '-';
-        // Dividend fallback if available in quote, else '-'
         const divYield = stock.dividendYield ? stock.dividendYield + '%' : '-';
         
         const html = `
@@ -542,20 +493,17 @@
             <div class="data-row"><span class="lbl">Dividend</span> <span class="val">${divYield}</span></div>
             <div class="data-row"><span class="lbl">52W High</span> <span class="val text-green">${stock.fiftyTwoWeekHigh?.toFixed(2) || '-'}</span></div>
             <div class="data-row"><span class="lbl">52W Low</span> <span class="val text-red">${stock.fiftyTwoWeekLow?.toFixed(2) || '-'}</span></div>
-            <div class="data-row"><span class="lbl">Day High</span> <span class="val">${stock.regularMarketDayHigh?.toFixed(2) || '-'}</span></div>
-            <div class="data-row"><span class="lbl">Day Low</span> <span class="val">${stock.regularMarketDayLow?.toFixed(2) || '-'}</span></div>
         `;
         document.getElementById('keyStats').innerHTML = html;
     }
 
-    // CORRECTED RENDER: Uses authoritative summary data (Called in Step 3)
+    // Detailed Stats from Summary
     function renderStats(data) {
         const k = data.defaultKeyStatistics || {};
         const s = data.summaryDetail || {};
         const f = data.financialData || {};
         const p = data.price || {};
 
-        // Parse Raw Value for correct calculation
         const mktCapRaw = s.marketCap?.raw || p.marketCap?.raw || 0;
         const mktCap = mktCapRaw ? (mktCapRaw / 10000000).toFixed(2) + ' Cr' : '-';
 
@@ -568,8 +516,6 @@
             <div class="data-row"><span class="lbl">ROE</span> <span class="val">${f.returnOnEquity?.fmt || '-'}</span></div>
             <div class="data-row"><span class="lbl">52W High</span> <span class="val text-green">${s.fiftyTwoWeekHigh?.fmt || '-'}</span></div>
             <div class="data-row"><span class="lbl">52W Low</span> <span class="val text-red">${s.fiftyTwoWeekLow?.fmt || '-'}</span></div>
-            <div class="data-row"><span class="lbl">Day High</span> <span class="val">${s.dayHigh?.fmt || '-'}</span></div>
-            <div class="data-row"><span class="lbl">Day Low</span> <span class="val">${s.dayLow?.fmt || '-'}</span></div>
         `;
         document.getElementById('keyStats').innerHTML = html;
     }
@@ -618,6 +564,31 @@
         chartRSI.render();
     }
 
+    // --- NEWS FETCH (NEW) ---
+    async function fetchNews(symbol) {
+        const newsList = document.getElementById('newsList');
+        newsList.innerHTML = '<div style="padding:10px; color:#777;">Loading latest news...</div>';
+        
+        // Using auto-complete endpoint to get news (Workaround for free tier)
+        const data = await safeFetch(`https://${API_HOST}/auto-complete?q=${symbol}&region=IN`);
+        
+        if(data && data.news && data.news.length > 0) {
+            newsList.innerHTML = '';
+            data.news.forEach(article => {
+                const date = new Date(article.providerPublishTime * 1000).toLocaleDateString();
+                newsList.innerHTML += `
+                    <div class="news-item">
+                        <a href="${article.link}" target="_blank" class="news-link">
+                            <div class="news-title">${article.title}</div>
+                            <div class="news-meta">By ${article.publisher} • ${date}</div>
+                        </a>
+                    </div>`;
+            });
+        } else {
+            newsList.innerHTML = '<div style="padding:10px;">No specific news found.</div>';
+        }
+    }
+
     function renderFinancials(data) {
         const earnings = data.earnings?.financialsChart?.yearly || [];
         if(earnings.length > 0) {
@@ -637,8 +608,6 @@
                 grid: { borderColor: '#2a2e39' }
             });
             chartFin.render();
-        } else {
-            document.getElementById('financialsChart').innerHTML = '<div style="padding:20px; text-align:center; color:#777">Financial chart not available</div>';
         }
 
         const f = data.financialData || {};
@@ -654,7 +623,7 @@
         const f = data.financialData || {};
         const k = data.defaultKeyStatistics || {};
         document.getElementById('ratioGrid').innerHTML = `
-            <div class="metric-box"><h4>P/E</h4><p>${data.summaryDetail.trailingPE?.fmt || '-'}</p></div>
+            <div class="metric-box"><h4>P/E</h4><p>${data.summaryDetail?.trailingPE?.fmt || '-'}</p></div>
             <div class="metric-box"><h4>P/B</h4><p>${k.priceToBook?.fmt || '-'}</p></div>
             <div class="metric-box"><h4>Debt/Eq</h4><p>${f.debtToEquity?.fmt || '-'}</p></div>
             <div class="metric-box"><h4>ROE</h4><p>${f.returnOnEquity?.fmt || '-'}</p></div>
