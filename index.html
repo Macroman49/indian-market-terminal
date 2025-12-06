@@ -153,6 +153,23 @@
             padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; outline: none; cursor: pointer;
         }
 
+        /* ANALYSIS BOX */
+        .analysis-box {
+            background: var(--bg-element);
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid var(--accent);
+            font-size: 0.9rem;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+        .analysis-box strong { color: #fff; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-right: 5px; }
+        .badge.bull { background: rgba(8, 153, 129, 0.2); color: var(--green); }
+        .badge.bear { background: rgba(242, 54, 69, 0.2); color: var(--red); }
+        .badge.neutral { background: rgba(132, 142, 156, 0.2); color: var(--text-muted); }
+
         /* TABS */
         .tabs-container { margin-top: 20px; }
         .tab-header { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
@@ -326,8 +343,12 @@
                     <button class="btn-time" onclick="updateChartRange('6mo')">6M</button>
                     <button class="btn-time" onclick="updateChartRange('1y')">1Y</button>
                 </div>
-                <div id="mainChart" style="min-height: 400px;"></div>
-                <div id="rsiChart" style="min-height: 130px; margin-top:-20px;"></div>
+                <!-- REDUCED CHART HEIGHT -->
+                <div id="mainChart" style="min-height: 300px;"></div>
+                <div id="rsiChart" style="min-height: 100px; margin-top:-20px;"></div>
+                
+                <!-- NEW ANALYSIS CARD -->
+                <div id="analysisCard" class="analysis-box" style="display:none;"></div>
             </div>
 
             <!-- TABS -->
@@ -542,25 +563,50 @@
         const quotes = result.indicators.quote[0];
         const timestamps = result.timestamp;
         let candleData = [], closeData = [];
+        let volumeData = [];
+
+        // Analysis Variables
+        let totalVol = 0;
+        let dayHigh = -Infinity;
+        let dayLow = Infinity;
 
         timestamps.forEach((t, i) => {
             if(quotes.open[i]) {
                 const d = new Date(t * 1000);
-                candleData.push({ x: d, y: [quotes.open[i], quotes.high[i], quotes.low[i], quotes.close[i]] });
-                closeData.push(quotes.close[i]);
+                const c = quotes.close[i];
+                candleData.push({ x: d, y: [quotes.open[i], quotes.high[i], quotes.low[i], c] });
+                closeData.push(c);
+                if(quotes.volume[i]) {
+                    volumeData.push(quotes.volume[i]);
+                    totalVol += quotes.volume[i];
+                }
+                if(quotes.high[i] > dayHigh) dayHigh = quotes.high[i];
+                if(quotes.low[i] < dayLow) dayLow = quotes.low[i];
             }
         });
 
         const rsi = calculateRSI(closeData);
         const rsiSeries = candleData.map((c, i) => ({ x: c.x, y: rsi[i] }));
+        
+        // Calculate EMAs
+        const ema13 = calculateEMA(closeData, 13);
+        const ema49 = calculateEMA(closeData, 49);
+        const ema13Series = candleData.map((c, i) => ({ x: c.x, y: ema13[i] }));
+        const ema49Series = candleData.map((c, i) => ({ x: c.x, y: ema49[i] }));
 
         if(chartMain) chartMain.destroy();
         if(chartRSI) chartRSI.destroy();
 
         chartMain = new ApexCharts(document.querySelector("#mainChart"), {
-            chart: { type: 'candlestick', height: 400, background: 'transparent', group: 'pro', toolbar:{show:false} },
+            chart: { type: 'candlestick', height: 300, background: 'transparent', group: 'pro', toolbar:{show:false} },
             theme: { mode: 'dark' },
-            series: [{ name: 'Price', data: candleData }],
+            series: [
+                { name: 'Price', type: 'candlestick', data: candleData },
+                { name: 'EMA 13', type: 'line', data: ema13Series },
+                { name: 'EMA 49', type: 'line', data: ema49Series }
+            ],
+            colors: ['#000', '#f1c40f', '#fff'],
+            stroke: { width: [1, 2, 2] },
             xaxis: { type: 'datetime', tooltip: { enabled: true }, axisTicks: {show:false} },
             yaxis: { tooltip: { enabled: true }, labels: { formatter: (v)=>v.toFixed(1) } },
             plotOptions: { candlestick: { colors: { upward: '#089981', downward: '#f23645' } } },
@@ -569,7 +615,7 @@
         chartMain.render();
 
         chartRSI = new ApexCharts(document.querySelector("#rsiChart"), {
-            chart: { type: 'line', height: 130, background: 'transparent', group: 'pro', toolbar:{show:false} },
+            chart: { type: 'line', height: 100, background: 'transparent', group: 'pro', toolbar:{show:false} },
             theme: { mode: 'dark' },
             series: [{ name: 'RSI', data: rsiSeries }],
             colors: ['#a64d79'],
@@ -579,6 +625,81 @@
             annotations: { yaxis: [{ y: 70, borderColor: '#f23645', opacity: 0.5 }, { y: 30, borderColor: '#089981', opacity: 0.5 }] }
         });
         chartRSI.render();
+
+        // --- RUN ANALYSIS ---
+        generateAnalysis(candleData, closeData, rsi, volumeData, totalVol, ema13, ema49);
+    }
+
+    // --- AI ANALYSIS LOGIC ---
+    function generateAnalysis(candles, closes, rsi, volumes, totalVol, ema13, ema49) {
+        if(candles.length < 2) return;
+
+        const last = candles[candles.length - 1];
+        const prev = candles[candles.length - 2];
+        const lastClose = last.y[3];
+        const lastOpen = last.y[0];
+        const lastHigh = last.y[1];
+        const lastLow = last.y[2];
+        
+        const lastRSI = rsi[rsi.length - 1] || 50;
+        const lastVol = volumes[volumes.length - 1] || 0;
+        const avgVol = totalVol / volumes.length;
+        
+        const lastEma13 = ema13[ema13.length - 1];
+        const lastEma49 = ema49[ema49.length - 1];
+
+        // 1. Trend Analysis
+        let trend = (lastClose > lastOpen) ? 
+            `<span class="badge bull">BULLISH</span> Candle` : 
+            `<span class="badge bear">BEARISH</span> Candle`;
+        
+        let moveDesc = `The stock moved from <strong>${lastOpen.toFixed(2)}</strong> to <strong>${lastClose.toFixed(2)}</strong>.`;
+
+        // 2. Moving Average
+        let maDesc = "";
+        if (lastClose > lastEma13 && lastEma13 > lastEma49) {
+            maDesc = "Price is above both EMA 13 and EMA 49, indicating a <strong class='text-green'>Strong Uptrend</strong>.";
+        } else if (lastClose < lastEma13 && lastClose < lastEma49) {
+            maDesc = "Price is below both EMAs, indicating a <strong class='text-red'>Downtrend</strong>.";
+        } else {
+            maDesc = "Price is hovering between EMAs, indicating <strong class='text-muted'>Consolidation</strong>.";
+        }
+
+        // 3. RSI
+        let rsiDesc = `RSI is at <strong>${lastRSI.toFixed(1)}</strong>.`;
+        if (lastRSI > 70) rsiDesc += " <span class='badge bear'>OVERBOUGHT</span> Caution advised.";
+        else if (lastRSI < 30) rsiDesc += " <span class='badge bull'>OVERSOLD</span> Potential bounce.";
+        else rsiDesc += " <span class='badge neutral'>NEUTRAL</span> zone.";
+
+        // 4. Volume & Bulk Deal
+        let volDesc = `Volume: <strong>${(lastVol/1000).toFixed(1)}K</strong> (Avg: ${(avgVol/1000).toFixed(1)}K).`;
+        let bulkDeal = "";
+        if (lastVol > avgVol * 2.5) {
+            volDesc += " <strong class='text-green'>High Volume Spike!</strong>";
+            bulkDeal = "<br>⚠️ <strong>Institutional Activity:</strong> Unusual volume detected. Possible Bulk/Block deal or major news reaction.";
+        } else {
+            volDesc += " Volume is normal.";
+        }
+
+        // 5. Pattern
+        let pattern = "";
+        const bodySize = Math.abs(lastClose - lastOpen);
+        const wickSize = (lastHigh - lastLow) - bodySize;
+        if (bodySize < wickSize * 0.1) pattern = "Pattern: <strong>Doji</strong> (Indecision detected).";
+        else if (lastClose > lastOpen && (lastClose - lastLow) > bodySize * 2 && (lastHigh - lastClose) < bodySize * 0.2) pattern = "Pattern: <strong>Hammer</strong> (Potential Reversal).";
+
+        // HTML Output
+        const html = `
+            ${trend} ${moveDesc}<br><br>
+            <strong>Moving Averages:</strong> ${maDesc}<br>
+            <strong>Momentum:</strong> ${rsiDesc}<br>
+            <strong>Volume:</strong> ${volDesc} ${bulkDeal}<br>
+            ${pattern ? `<br>${pattern}` : ''}
+        `;
+
+        const card = document.getElementById('analysisCard');
+        card.style.display = 'block';
+        card.innerHTML = html;
     }
 
     // --- NEWS FETCH (NEW) ---
@@ -671,6 +792,15 @@
         if (!currentSymbol) return;
         const chartData = await safeFetch(`https://${API_HOST}/stock/v3/get-chart?interval=${currentInterval}&range=${currentRange}&symbol=${currentSymbol}&region=IN`);
         if(chartData) renderCharts(chartData.chart?.result?.[0]);
+    }
+
+    function calculateEMA(prices, period) {
+        const k = 2 / (period + 1);
+        let ema = [prices[0]];
+        for (let i = 1; i < prices.length; i++) {
+            ema.push((prices[i] * k) + (ema[i - 1] * (1 - k)));
+        }
+        return ema;
     }
 
     function calculateRSI(prices, period = 14) {
