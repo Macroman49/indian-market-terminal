@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTrade Terminal | Indian Markets</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- PROFESSIONAL DARK THEME --- */
+        :root {
+            --bg-body: #0b0e11;
+            --bg-panel: #151924;
+            --bg-element: #2a2e39;
+            --border: #2a2e39;
+            --text-main: #e1e3eb;
+            --text-muted: #848e9c;
+            --accent: #2962ff;
+            --green: #089981;
+            --red: #f23645;
+            --font: 'Inter', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: var(--font); background: var(--bg-body); color: var(--text-main); font-size: 14px; }
+
+        /* UTILS */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-10 { gap: 10px; }
+        .gap-20 { gap: 20px; }
+        .text-green { color: var(--green); }
+        .text-red { color: var(--red); }
+        .text-muted { color: var(--text-muted); }
+        .font-bold { font-weight: 700; }
+
+        /* --- 1. TOP MARQUEE --- */
+        .marquee-container {
+            background: var(--bg-panel); border-bottom: 1px solid var(--border);
+            height: 30px; overflow: hidden; white-space: nowrap; position: relative;
+        }
+        .marquee-content { display: inline-block; animation: scroll 60s linear infinite; padding-top: 5px; }
+        .ticker-item { display: inline-block; margin-right: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* --- 2. HEADER & SEARCH --- */
+        .main-header { padding: 15px 30px; border-bottom: 1px solid var(--border); background: var(--bg-panel); }
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; color: var(--text-main); }
+        .logo span { color: var(--accent); }
+
+        .search-wrapper { position: relative; width: 400px; }
+        .search-box {
+            width: 100%; background: #000; border: 1px solid var(--border);
+            color: white; padding: 10px 15px 10px 40px; border-radius: 4px;
+            font-family: var(--font); font-size: 0.9rem; outline: none; transition: 0.2s;
+        }
+        .search-box:focus { border-color: var(--accent); }
+        .search-icon { position: absolute; left: 12px; top: 12px; color: var(--text-muted); }
+        
+        .search-results {
+            position: absolute; top: 100%; left: 0; width: 100%;
+            background: var(--bg-panel); border: 1px solid var(--border);
+            z-index: 100; max-height: 300px; overflow-y: auto; display: none;
+        }
+        .result-item { padding: 10px 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; }
+        .result-item:hover { background: var(--bg-element); }
+
+        /* --- 3. INDICES BAR --- */
+        .indices-bar { 
+            display: flex; gap: 15px; padding: 15px 30px; border-bottom: 1px solid var(--border); 
+            overflow-x: auto; background: #0e1116; 
+        }
+        .mini-index { 
+            background: var(--bg-panel); padding: 10px 15px; border-radius: 4px; border: 1px solid var(--border); 
+            min-width: 140px; text-align: center; 
+        }
+        .idx-name { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .idx-val { font-size: 1rem; font-weight: 700; margin-top: 2px; }
+
+        /* --- 4. LEARNING HUB --- */
+        .basics-section { padding: 20px 30px; border-bottom: 1px solid var(--border); }
+        .basics-header { font-size: 1rem; color: var(--accent); margin-bottom: 10px; font-weight: 600; text-transform: uppercase; }
+        .basics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .term-card { 
+            background: var(--bg-panel); padding: 12px; border-radius: 4px; 
+            border-left: 2px solid var(--green); border: 1px solid var(--border);
+        }
+        .term-title { font-weight: 700; color: var(--text-main); font-size: 0.9rem; margin-bottom: 4px; display: block; }
+        .term-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* --- 5. DASHBOARD GRID --- */
+        .dashboard { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px 30px; margin: 0 auto; display: none; }
+        
+        /* LEFT SIDEBAR */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
+        .card { background: var(--bg-panel); border-radius: 6px; border: 1px solid var(--border); padding: 20px; }
+        
+        .stock-header h2 { margin: 0; font-size: 1.8rem; }
+        .stock-header .price { font-size: 2rem; font-weight: 700; margin: 10px 0; display: block; }
+        
+        .data-row { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .data-row:last-child { border: none; }
+        .lbl { color: var(--text-muted); font-size: 0.85rem; }
+        .val { font-weight: 600; font-size: 0.95rem; }
+
+        /* RIGHT PANEL */
+        .main-panel { display: flex; flex-direction: column; gap: 20px; }
+        .chart-toolbar { display: flex; gap: 10px; margin-bottom: 10px; justify-content: flex-end; }
+        .btn-time {
+            background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+            padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: 0.2s;
+        }
+        .btn-time:hover, .btn-time.active { background: var(--bg-element); color: var(--accent); border-color: var(--accent); }
+
+        /* TABS */
+        .tabs-container { margin-top: 20px; }
+        .tab-header { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .tab-btn {
+            padding: 10px 20px; background: transparent; border: none;
+            color: var(--text-muted); font-weight: 600; cursor: pointer;
+            border-bottom: 2px solid transparent; font-size: 0.95rem;
+        }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* GRIDS */
+        .financial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }
+        .metric-box { background: var(--bg-body); padding: 15px; border-radius: 4px; text-align: center; border: 1px solid var(--border); }
+        .metric-box h4 { margin: 0 0 5px 0; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
+        .metric-box p { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+
+        .loader { text-align: center; padding: 50px; color: var(--accent); font-size: 1.2rem; display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. LIVE MARQUEE -->
+    <div class="marquee-container">
+        <div id="marquee" class="marquee-content">Loading Ticker...</div>
+    </div>
+
+    <!-- 2. NAVBAR -->
+    <div class="main-header flex items-center justify-between">
+        <div class="logo"><i class="fas fa-chart-line"></i> Pro<span>Trade</span></div>
+        
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="stockSearch" class="search-box" placeholder="Search Symbol (e.g. RELIANCE, TATA, INFY)..." autocomplete="off">
+            <div id="searchResults" class="search-results"></div>
+        </div>
+
+        <div class="user-profile flex items-center gap-10">
+            <span class="text-muted"><i class="fas fa-clock"></i> <span id="clock">--:--</span></span>
+        </div>
+    </div>
+
+    <!-- 3. INDICES BAR -->
+    <div class="indices-bar" id="indicesBar">
+        <div style="color:#777; font-size:0.9rem;">Loading Market Indices...</div>
+    </div>
+
+    <!-- 4. LEARNING HUB -->
+    <div class="basics-section">
+        <div class="basics-header"><i class="fas fa-book"></i> Market Basics</div>
+        <div class="basics-grid">
+            <div class="term-card"><span class="term-title">Market Cap</span><span class="term-desc">Total value of a company's shares.</span></div>
+            <div class="term-card"><span class="term-title">P/E Ratio</span><span class="term-desc">Valuation ratio (Price / Earnings).</span></div>
+            <div class="term-card"><span class="term-title">Dividend</span><span class="term-desc">Profits shared with shareholders.</span></div>
+            <div class="term-card"><span class="term-title">EPS</span><span class="term-desc">Earnings Per Share (Profit / Shares).</span></div>
+            <div class="term-card"><span class="term-title">ROE</span><span class="term-desc">Return on Equity (Profitability).</span></div>
+            <div class="term-card"><span class="term-title">Bull/Bear</span><span class="term-desc">Market Trend: Up (Bull) or Down (Bear).</span></div>
+        </div>
+    </div>
+
+    <div id="loader" class="loader"><i class="fas fa-circle-notch fa-spin"></i> Analyzing Data...</div>
+
+    <!-- 5. MAIN DASHBOARD -->
+    <div id="dashboard" class="dashboard">
+        
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+            <div class="card stock-header">
+                <h2 id="stockName">Stock Name</h2>
+                <span id="stockSymbol" class="text-muted">SYMBOL</span>
+                <span id="stockPrice" class="price">₹0.00</span>
+                <span id="stockChange" class="text-green">+0.00 (0.00%)</span>
+            </div>
+
+            <div class="card">
+                <h3 class="text-muted" style="margin-top:0; font-size:0.8rem; margin-bottom:15px;">KEY STATISTICS</h3>
+                <div id="keyStats"></div>
+            </div>
+        </aside>
+
+        <!-- RIGHT PANEL -->
+        <main class="main-panel">
+            
+            <!-- CHART -->
+            <div class="card" style="padding: 10px;">
+                <div class="chart-toolbar">
+                    <button class="btn-time active" onclick="updateChartRange('1d')">1D</button>
+                    <button class="btn-time" onclick="updateChartRange('5d')">5D</button>
+                    <button class="btn-time" onclick="updateChartRange('1mo')">1M</button>
+                    <button class="btn-time" onclick="updateChartRange('6mo')">6M</button>
+                    <button class="btn-time" onclick="updateChartRange('1y')">1Y</button>
+                </div>
+                <div id="mainChart" style="min-height: 400px;"></div>
+                <div id="rsiChart" style="min-height: 130px; margin-top:-20px;"></div>
+            </div>
+
+            <!-- TABS -->
+            <div class="card tabs-container">
+                <div class="tab-header">
+                    <button class="tab-btn active" onclick="switchTab('financials')">Financials</button>
+                    <button class="tab-btn" onclick="switchTab('ratios')">Ratios</button>
+                    <button class="tab-btn" onclick="switchTab('news')">News</button>
+                </div>
+
+                <div id="financials" class="tab-content active">
+                    <div id="financialsChart" style="min-height: 250px;"></div>
+                    <div class="financial-grid" id="finStatsGrid"></div>
+                </div>
+
+                <div id="ratios" class="tab-content">
+                    <div class="financial-grid" id="ratioGrid"></div>
+                </div>
+
+                <div id="news" class="tab-content">
+                    <div id="newsList" style="padding:10px;">No recent news found via free API.</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+<script>
+    const API_KEY = '08749ab528msh0588036cff901aep1cbb48jsn3ce1496719b7'; 
+    const API_HOST = 'apidojo-yahoo-finance-v1.p.rapidapi.com'; 
+
+    let currentSymbol = '';
+    let chartMain, chartRSI, chartFin;
+
+    window.onload = function() {
+        startClock();
+        loadIndices(); 
+        loadMarquee();
+    };
+
+    function startClock() {
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        }, 1000);
+    }
+
+    // --- SAFE FETCH WRAPPER ---
+    async function safeFetch(url) {
+        try {
+            const res = await fetch(url, { headers: { 'X-RapidAPI-Key': API_KEY, 'X-RapidAPI-Host': API_HOST } });
+            if (!res.ok) {
+                console.warn(`API Error ${res.status}: ${res.statusText}`);
+                return null;
+            }
+            return await res.json();
+        } catch (e) {
+            console.warn("Fetch failed:", e);
+            return null;
+        }
+    }
+
+    // --- LOAD INDICES ---
+    async function loadIndices() {
+        // Fetch fewer indices to avoid rate limit issues
+        const symbols = '^NSEI,^BSESN,^NSEBANK';
+        const data = await safeFetch(`https://${API_HOST}/market/v2/get-quotes?region=IN&symbols=${symbols}`);
+        
+        if(data && data.quoteResponse) {
+            const container = document.getElementById('indicesBar');
+            container.innerHTML = '';
+            
+            data.quoteResponse.result.forEach(idx => {
+                const change = idx.regularMarketChangePercent?.toFixed(2) || 0;
+                const color = change >= 0 ? '#089981' : '#f23645';
+                
+                container.innerHTML += `
+                    <div class="mini-index">
+                        <div class="idx-name">${idx.shortName || idx.symbol}</div>
+                        <div class="idx-val" style="color:${color}">
+                            ${idx.regularMarketPrice?.toFixed(2)} (${change}%)
+                        </div>
+                    </div>`;
+            });
+        }
+    }
+
+    // --- MARQUEE ---
+    async function loadMarquee() {
+        const topStocks = 'RELIANCE.NS,TCS.NS,HDFCBANK.NS,INFY.NS';
+        const data = await safeFetch(`https://${API_HOST}/market/v2/get-quotes?region=IN&symbols=${topStocks}`);
+        
+        if(data && data.quoteResponse) {
+            const marquee = document.getElementById('marquee');
+            marquee.innerHTML = '';
+            data.quoteResponse.result.forEach(stock => {
+                const color = stock.regularMarketChange >= 0 ? '#089981' : '#f23645';
+                marquee.innerHTML += `<div class="ticker-item" onclick="loadStockData('${stock.symbol}')">${stock.symbol.replace('.NS','')} <span style="color:${color}">${stock.regularMarketPrice}</span></div>`;
+            });
+        }
+    }
+
+    // --- SEARCH ---
+    let debounce;
+    document.getElementById('stockSearch').addEventListener('keyup', (e) => {
+        clearTimeout(debounce);
+        if(e.target.value.length < 3) return;
+        debounce = setTimeout(() => performSearch(e.target.value), 800);
+    });
+
+    async function performSearch(query) {
+        const resultsBox = document.getElementById('searchResults');
+        resultsBox.style.display = 'block';
+        resultsBox.innerHTML = '<div style="padding:10px; color:#777;">Searching...</div>';
+        
+        const data = await safeFetch(`https://${API_HOST}/auto-complete?q=${query}&region=IN`);
+        
+        resultsBox.innerHTML = '';
+        if(data && data.quotes) {
+            data.quotes.forEach(q => {
+                // Expanded filter to catch NSE/BSE/NSI
+                if(q.exchange === 'NSI' || q.exchange === 'NSE' || q.exchange === 'BSE' || q.symbol.includes('.NS') || q.symbol.includes('.BO')) {
+                    resultsBox.innerHTML += `<div class="result-item" onclick="loadStockData('${q.symbol}')"><b>${q.symbol}</b> <span class="text-muted">${q.shortname || ''}</span></div>`;
+                }
+            });
+        } else {
+            resultsBox.innerHTML = '<div style="padding:10px;">No results</div>';
+        }
+    }
+
+    // --- MAIN DATA LOADER ---
+    async function loadStockData(symbol) {
+        currentSymbol = symbol;
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('stockSearch').value = '';
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('dashboard').style.display = 'none';
+
+        // 1. PRIMARY FETCH: Basic Quote (Reliable)
+        const quoteData = await safeFetch(`https://${API_HOST}/market/v2/get-quotes?region=IN&symbols=${symbol}`);
+        
+        if(!quoteData || !quoteData.quoteResponse || !quoteData.quoteResponse.result || quoteData.quoteResponse.result.length === 0) {
+            alert("Unable to fetch stock data. API limit may be reached.");
+            document.getElementById('loader').style.display = 'none';
+            return;
+        }
+
+        const stock = quoteData.quoteResponse.result[0];
+        renderHeaderFromQuote(stock);
+        renderStatsFromQuote(stock);
+
+        // 2. CHART FETCH
+        const chartData = await safeFetch(`https://${API_HOST}/stock/v3/get-chart?interval=1d&range=1y&symbol=${symbol}&region=IN`);
+        if(chartData) renderCharts(chartData.chart?.result?.[0]);
+
+        // 3. OPTIONAL FETCH: Summary (Might fail on free tier, but we don't break the app)
+        const summaryData = await safeFetch(`https://${API_HOST}/stock/v2/get-summary?symbol=${symbol}&region=IN`);
+        if(summaryData) {
+            renderFinancials(summaryData);
+            renderRatios(summaryData);
+            // Explicitly update stats with correct Summary Data
+            renderStats(summaryData);
+        } else {
+            document.getElementById('financialsChart').innerHTML = '<div style="padding:20px; color:#777; text-align:center;">Detailed financials not available</div>';
+        }
+
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'grid';
+    }
+
+    // --- RENDERERS ---
+    
+    function renderHeaderFromQuote(stock) {
+        document.getElementById('stockName').innerText = stock.shortName || stock.longName || stock.symbol;
+        document.getElementById('stockSymbol').innerText = stock.symbol;
+        document.getElementById('stockPrice').innerText = `₹${stock.regularMarketPrice.toFixed(2)}`;
+        
+        const change = stock.regularMarketChange;
+        const colorClass = change >= 0 ? 'text-green' : 'text-red';
+        document.getElementById('stockChange').className = colorClass;
+        document.getElementById('stockChange').innerText = `${stock.regularMarketChange.toFixed(2)} (${stock.regularMarketChangePercent.toFixed(2)}%)`;
+    }
+
+    // INITIAL RENDER: Uses basic quote data (fast but maybe less accurate)
+    function renderStatsFromQuote(stock) {
+        const marketCap = stock.marketCap ? (stock.marketCap / 10000000).toFixed(2) + ' Cr' : '-';
+        // Dividend fallback if available in quote, else '-'
+        const divYield = stock.dividendYield ? stock.dividendYield + '%' : '-';
+        
+        const html = `
+            <div class="data-row"><span class="lbl">Market Cap</span> <span class="val">${marketCap}</span></div>
+            <div class="data-row"><span class="lbl">P/E Ratio</span> <span class="val">${stock.trailingPE?.toFixed(2) || '-'}</span></div>
+            <div class="data-row"><span class="lbl">EPS (TTM)</span> <span class="val">${stock.epsTrailingTwelveMonths?.toFixed(2) || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Book Value</span> <span class="val">${stock.bookValue?.toFixed(2) || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Dividend</span> <span class="val">${divYield}</span></div>
+            <div class="data-row"><span class="lbl">52W High</span> <span class="val text-green">${stock.fiftyTwoWeekHigh?.toFixed(2) || '-'}</span></div>
+            <div class="data-row"><span class="lbl">52W Low</span> <span class="val text-red">${stock.fiftyTwoWeekLow?.toFixed(2) || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Day High</span> <span class="val">${stock.regularMarketDayHigh?.toFixed(2) || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Day Low</span> <span class="val">${stock.regularMarketDayLow?.toFixed(2) || '-'}</span></div>
+        `;
+        document.getElementById('keyStats').innerHTML = html;
+    }
+
+    // CORRECTED RENDER: Uses authoritative summary data (Called in Step 3)
+    function renderStats(data) {
+        const k = data.defaultKeyStatistics || {};
+        const s = data.summaryDetail || {};
+        const f = data.financialData || {};
+        const p = data.price || {};
+
+        // Parse Raw Value for correct calculation
+        const mktCapRaw = s.marketCap?.raw || p.marketCap?.raw || 0;
+        const mktCap = mktCapRaw ? (mktCapRaw / 10000000).toFixed(2) + ' Cr' : '-';
+
+        const html = `
+            <div class="data-row"><span class="lbl">Market Cap</span> <span class="val">${mktCap}</span></div>
+            <div class="data-row"><span class="lbl">P/E Ratio</span> <span class="val">${s.trailingPE?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">EPS (TTM)</span> <span class="val">${k.trailingEps?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Book Value</span> <span class="val">${k.bookValue?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Dividend</span> <span class="val">${s.dividendYield?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">ROE</span> <span class="val">${f.returnOnEquity?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">52W High</span> <span class="val text-green">${s.fiftyTwoWeekHigh?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">52W Low</span> <span class="val text-red">${s.fiftyTwoWeekLow?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Day High</span> <span class="val">${s.dayHigh?.fmt || '-'}</span></div>
+            <div class="data-row"><span class="lbl">Day Low</span> <span class="val">${s.dayLow?.fmt || '-'}</span></div>
+        `;
+        document.getElementById('keyStats').innerHTML = html;
+    }
+
+    function renderCharts(result) {
+        if(!result) return;
+        const quotes = result.indicators.quote[0];
+        const timestamps = result.timestamp;
+        let candleData = [], closeData = [];
+
+        timestamps.forEach((t, i) => {
+            if(quotes.open[i]) {
+                const d = new Date(t * 1000);
+                candleData.push({ x: d, y: [quotes.open[i], quotes.high[i], quotes.low[i], quotes.close[i]] });
+                closeData.push(quotes.close[i]);
+            }
+        });
+
+        const rsi = calculateRSI(closeData);
+        const rsiSeries = candleData.map((c, i) => ({ x: c.x, y: rsi[i] }));
+
+        if(chartMain) chartMain.destroy();
+        if(chartRSI) chartRSI.destroy();
+
+        chartMain = new ApexCharts(document.querySelector("#mainChart"), {
+            chart: { type: 'candlestick', height: 400, background: 'transparent', group: 'pro', toolbar:{show:false} },
+            theme: { mode: 'dark' },
+            series: [{ name: 'Price', data: candleData }],
+            xaxis: { type: 'datetime', tooltip: { enabled: true }, axisTicks: {show:false} },
+            yaxis: { tooltip: { enabled: true }, labels: { formatter: (v)=>v.toFixed(1) } },
+            plotOptions: { candlestick: { colors: { upward: '#089981', downward: '#f23645' } } },
+            grid: { borderColor: '#2a2e39' }
+        });
+        chartMain.render();
+
+        chartRSI = new ApexCharts(document.querySelector("#rsiChart"), {
+            chart: { type: 'line', height: 130, background: 'transparent', group: 'pro', toolbar:{show:false} },
+            theme: { mode: 'dark' },
+            series: [{ name: 'RSI', data: rsiSeries }],
+            colors: ['#a64d79'],
+            yaxis: { min: 0, max: 100, tickAmount: 3 },
+            xaxis: { type: 'datetime', labels: {show:false}, axisTicks: {show:false} },
+            grid: { borderColor: '#2a2e39' },
+            annotations: { yaxis: [{ y: 70, borderColor: '#f23645', opacity: 0.5 }, { y: 30, borderColor: '#089981', opacity: 0.5 }] }
+        });
+        chartRSI.render();
+    }
+
+    function renderFinancials(data) {
+        const earnings = data.earnings?.financialsChart?.yearly || [];
+        if(earnings.length > 0) {
+            const categories = earnings.map(e => e.date);
+            const revenue = earnings.map(e => e.revenue.raw);
+            const profit = earnings.map(e => e.earnings.raw);
+
+            if(chartFin) chartFin.destroy();
+            chartFin = new ApexCharts(document.querySelector("#financialsChart"), {
+                chart: { type: 'bar', height: 250, background: 'transparent', toolbar:{show:false} },
+                theme: { mode: 'dark' },
+                series: [{ name: 'Revenue', data: revenue }, { name: 'Profit', data: profit }],
+                colors: ['#2962ff', '#089981'],
+                xaxis: { categories: categories },
+                yaxis: { labels: { formatter: (val) => (val/10000000).toFixed(0) + "Cr" } },
+                dataLabels: { enabled: false },
+                grid: { borderColor: '#2a2e39' }
+            });
+            chartFin.render();
+        } else {
+            document.getElementById('financialsChart').innerHTML = '<div style="padding:20px; text-align:center; color:#777">Financial chart not available</div>';
+        }
+
+        const f = data.financialData || {};
+        document.getElementById('finStatsGrid').innerHTML = `
+            <div class="metric-box"><h4>Revenue</h4><p>${f.totalRevenue?.fmt || '-'}</p></div>
+            <div class="metric-box"><h4>Gross Profit</h4><p>${f.grossProfits?.fmt || '-'}</p></div>
+            <div class="metric-box"><h4>Margins</h4><p>${f.operatingMargins?.fmt || '-'}</p></div>
+            <div class="metric-box"><h4>Growth</h4><p>${f.revenueGrowth?.fmt || '-'}</p></div>
+        `;
+    }
+
+    function renderRatios(data) {
+        const f = data.financialData || {};
+        const k = data.defaultKeyStatistics || {};
+        document.getElementById('ratioGrid').innerHTML = `
+            <div class="metric-box"><h4>P/E</h4><p>${data.summaryDetail.trailingPE?.fmt || '-'}</p></div>
+            <div class="metric-box"><h4>P/B</h4><p>${k.priceToBook?.fmt || '-'}</p></div>
+            <div class="metric-box"><h4>Debt/Eq</h4><p>${f.debtToEquity?.fmt || '-'}</p></div>
+            <div class="metric-box"><h4>ROE</h4><p>${f.returnOnEquity?.fmt || '-'}</p></div>
+        `;
+    }
+
+    // --- HELPERS ---
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    window.updateChartRange = function(range) {
+        document.querySelectorAll('.btn-time').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        const interval = range === '1d' ? '5m' : '1d';
+        safeFetch(`https://${API_HOST}/stock/v3/get-chart?interval=${interval}&range=${range}&symbol=${currentSymbol}&region=IN`)
+            .then(d => renderCharts(d?.chart?.result?.[0]));
+    }
+
+    function calculateRSI(prices, period = 14) {
+        let rsi = Array(period).fill(null);
+        let gains = 0, losses = 0;
+        for (let i = 1; i <= period; i++) {
+            let diff = prices[i] - prices[i - 1];
+            if (diff >= 0) gains += diff; else losses += Math.abs(diff);
+        }
+        let avgGain = gains / period;
+        let avgLoss = losses / period;
+        for (let i = period + 1; i < prices.length; i++) {
+            let diff = prices[i] - prices[i - 1];
+            let gain = diff > 0 ? diff : 0;
+            let loss = diff < 0 ? Math.abs(diff) : 0;
+            avgGain = ((avgGain * 13) + gain) / 14;
+            avgLoss = ((avgLoss * 13) + loss) / 14;
+            let rs = avgGain / avgLoss;
+            rsi.push(100 - (100 / (1 + rs)));
+        }
+        return rsi;
+    }
+</script>
+</body>
+</html>
